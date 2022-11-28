@@ -45,3 +45,6 @@ Proszę o przygotowanie komputera z systemem Windows (rekomendowany system Windo
 
 ## W razie problemów
 Pisz na mój adres email: *t.klepacki@wp.pl*
+
+## Notatki
+Google Docs: https://docs.google.com/document/d/1RqUe1DkDPB2K4awu-X7C8339D3F7fzcSs3kid5S84Uc/edit?usp=sharing
