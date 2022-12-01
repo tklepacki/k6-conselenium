@@ -55,6 +55,17 @@ export default function main() {
         }
     }
 
+    let getCheckoutCartPageRequest = {
+        method: 'GET',
+        url: 'https://www.reserved.com/pl/pl/checkout/cart/',
+        params: {
+            tags: {
+                name: 'RE - Get Checkout Cart Page',
+            },
+        }
+    }
+
+    console.log("User Login Scenario")
     group(
         "Login Page - https://www.reserved.com/pl/pl/customer/account/login/#login", function () {
             let getCustomerAccountLoginPageResponse = http.get(getCustomerAccountLoginPageRequest.url, getCustomerAccountLoginPageRequest.params);
@@ -97,4 +108,13 @@ export default function main() {
             'User has been logged in successfully': (r) => r.body.includes('Tomasz') == true
         })
     })
+
+    console.log("Checkout Cart Visit Scenario")
+    group("Checkout Cart Page - https://www/reserved.com/pl/pl/checkout/cart/", function () {
+        let getCheckoutCartPageResponse = http.get(getCheckoutCartPageRequest.url, getCheckoutCartPageRequest.params)
+        check(getCheckoutCartPageResponse, { 'GET - Checkout Cart Page status was 200': (r) => r.status == 200 })
+
+        let getVarnishAjaxNewIndexResponse = http.get(getVarnishAjaxNewIndexRequest.url, getVarnishAjaxNewIndexRequest.params)
+        check(getVarnishAjaxNewIndexResponse, { 'GET - Varnish status was 200': (r) => r.status == 200 })
+    });
 }
