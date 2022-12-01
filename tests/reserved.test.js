@@ -1,5 +1,6 @@
 import { group } from 'k6'
 import http from 'k6/http'
+import * as helper from '../helpers/helper.js'
 
 export const options = {
     ext: {
@@ -31,31 +32,32 @@ export default function main() {
         }
     }
 
-    let postCustomerLoginRequest = {
-        method: 'POST',
-        url: 'https://www.reserved.com/pl/pl/ajx/customer/login/referer/aHR0cHM6Ly93d3cucmVzZXJ2ZWQuY29tL3BsL3BsLw,,/uenc/aHR0cHM6Ly93d3cucmVzZXJ2ZWQuY29tL3BsL3BsLw,,/?lpp_new_login',
-        body: {
-            'login[username]': 'performancetests0001@wp.pl',
-            'login[password]': 'Qweasd12@',
-            'login[remember_me]': '0',
-            form_key: 'e2CMPgbokon79O5r',
-        },
-        params: {
-            headers: {
-                accept: 'application/x-www-form-urlencoded; charset=UTF-8',
-            }
-        }
-    }
-
     let getMainPageRequest = {
         method: 'GET',
         url: 'https://www.reserved.com/pl/pl/'
     }
 
     group('Login Page - https://www.reserved.com/pl/pl/customer/account/login/#login', function () {
-        http.get(getCustomerAccountLoginPageRequest.url)
+        let getCustomerAccountLoginPageResponse = http.get(getCustomerAccountLoginPageRequest.url)
+        let formKey = helper.getFormKey(getCustomerAccountLoginPageResponse)
 
         http.get(getVarnishAjaxNewIndexRequest.url, getVarnishAjaxNewIndexRequest.params)
+
+        let postCustomerLoginRequest = {
+            method: 'POST',
+            url: 'https://www.reserved.com/pl/pl/ajx/customer/login/referer/aHR0cHM6Ly93d3cucmVzZXJ2ZWQuY29tL3BsL3BsLw,,/uenc/aHR0cHM6Ly93d3cucmVzZXJ2ZWQuY29tL3BsL3BsLw,,/?lpp_new_login',
+            body: {
+                'login[username]': 'performancetests0001@wp.pl',
+                'login[password]': 'Qweasd12@',
+                'login[remember_me]': '0',
+                form_key: formKey,
+            },
+            params: {
+                headers: {
+                    accept: 'application/x-www-form-urlencoded; charset=UTF-8',
+                }
+            }
+        }
 
         http.post(postCustomerLoginRequest.url, postCustomerLoginRequest.body, postCustomerLoginRequest.params)
     })
@@ -63,6 +65,7 @@ export default function main() {
     group('page_3 - https://www.reserved.com/pl/pl/', function () {
         http.get(getMainPageRequest.url,)
 
-        http.get(getVarnishAjaxNewIndexRequest.url, getVarnishAjaxNewIndexRequest.params)
+        let getVarnishAjaxNewIndexResponse = http.get(getVarnishAjaxNewIndexRequest.url, getVarnishAjaxNewIndexRequest.params)
+        console.log(getVarnishAjaxNewIndexResponse.body)
     })
 }
