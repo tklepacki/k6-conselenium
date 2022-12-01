@@ -2,10 +2,13 @@ import { group, check } from "k6";
 import http from 'k6/http'
 import * as helper from '../helpers/helper.js'
 import { SharedArray } from "k6/data"
+import {Counter} from "k6/metrics"
 
 const userData = new SharedArray("Test User Data", function () {
     return JSON.parse(open('users.json')).users;
 })
+
+let errors = new Counter("errors")
 
 export const options = {
     ext: {
@@ -79,11 +82,13 @@ export default function main() {
     group(
         "Login Page - https://www.reserved.com/pl/pl/customer/account/login/#login", function () {
             let getCustomerAccountLoginPageResponse = http.get(getCustomerAccountLoginPageRequest.url, getCustomerAccountLoginPageRequest.params);
-            check(getCustomerAccountLoginPageResponse, { 'GET - Customer Account Login Page status was 200': (r) => r.status == 200 })
+            let getCustomerAccountLoginPageResponseCheck = check(getCustomerAccountLoginPageResponse, { 'GET - Customer Account Login Page status was 200': (r) => r.status == 200 })
+            errors.add(!getCustomerAccountLoginPageResponseCheck)
             let formKey = helper.getFormKey(getCustomerAccountLoginPageResponse)
 
             let getVarnishAjaxNewIndexResponse = http.get(getVarnishAjaxNewIndexRequest.url, getVarnishAjaxNewIndexRequest.params)
-            check(getVarnishAjaxNewIndexResponse, { 'GET - Varnish status was 200': (r) => r.status == 200 })
+            let getVarnishAjaxNewIndexResponseCheck = check(getVarnishAjaxNewIndexResponse, { 'GET - Varnish status was 200': (r) => r.status == 200 })
+            errors.add(!getVarnishAjaxNewIndexResponseCheck)
 
             let postCustomerLoginRequest = {
                 method: 'POST',
@@ -105,28 +110,33 @@ export default function main() {
             }
 
             let postCustomerLoginResponse = http.post(postCustomerLoginRequest.url, postCustomerLoginRequest.body, postCustomerLoginRequest.params)
-            check(postCustomerLoginResponse, { 'POST - Customer Login status was 200': (r) => r.status == 200 })
+            let postCustomerLoginResponseCheck = check(postCustomerLoginResponse, { 'POST - Customer Login status was 200': (r) => r.status == 200 })
+            errors.add(!postCustomerLoginResponseCheck)
         })
 
     group("Main Page After Uset Log In - https://www.reserved.com/pl/pl/", function () {
         let getMainPageResponse = http.get(getMainPageRequest.url, getMainPageRequest.params);
-        check(getMainPageResponse, { 'GET - Main Page status was 200': (r) => r.status == 200 })
+        let getMainPageResponseCheck = check(getMainPageResponse, { 'GET - Main Page status was 200': (r) => r.status == 200 })
+        errors.add(!getMainPageResponseCheck)
 
         let getVarnishAjaxNewIndexResponse = http.get(getVarnishAjaxNewIndexRequest.url, getVarnishAjaxNewIndexRequest.params)
-        check(getVarnishAjaxNewIndexResponse, {
+        let getVarnishAjaxNewIndexResponseCheck = check(getVarnishAjaxNewIndexResponse, {
             'GET - Varnish status was 200': (r) => r.status == 200,
             'User has been logged in successfully': (r) => r.body.includes(userData[randomUserNumber].firstName) == true
         })
+        errors.add(!getVarnishAjaxNewIndexResponseCheck)
     })
 
     if (randomUserScenario <= 19.00) {
         console.log("Checkout Cart Visit Scenario")
         group("Checkout Cart Page - https://www/reserved.com/pl/pl/checkout/cart/", function () {
             let getCheckoutCartPageResponse = http.get(getCheckoutCartPageRequest.url, getCheckoutCartPageRequest.params)
-            check(getCheckoutCartPageResponse, { 'GET - Checkout Cart Page status was 200': (r) => r.status == 200 })
+            let getCheckoutCartPageResponseCheck = check(getCheckoutCartPageResponse, { 'GET - Checkout Cart Page status was 200': (r) => r.status == 200 })
+            errors.add(!getCheckoutCartPageResponseCheck)
 
             let getVarnishAjaxNewIndexResponse = http.get(getVarnishAjaxNewIndexRequest.url, getVarnishAjaxNewIndexRequest.params)
-            check(getVarnishAjaxNewIndexResponse, { 'GET - Varnish status was 200': (r) => r.status == 200 })
+            let getVarnishAjaxNewIndexResponseCheck = check(getVarnishAjaxNewIndexResponse, { 'GET - Varnish status was 200': (r) => r.status == 200 })
+            errors.add(!getVarnishAjaxNewIndexResponseCheck)
         });
     }
 }
