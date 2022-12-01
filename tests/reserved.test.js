@@ -22,6 +22,8 @@ export const options = {
 };
 
 export default function main() {
+    let randomUserScenario = helper.getRandomNumber()
+
     let getCustomerAccountLoginPageRequest = {
         method: 'GET',
         url: 'https://www.reserved.com/pl/pl/customer/account/login/',
@@ -109,12 +111,14 @@ export default function main() {
         })
     })
 
-    console.log("Checkout Cart Visit Scenario")
-    group("Checkout Cart Page - https://www/reserved.com/pl/pl/checkout/cart/", function () {
-        let getCheckoutCartPageResponse = http.get(getCheckoutCartPageRequest.url, getCheckoutCartPageRequest.params)
-        check(getCheckoutCartPageResponse, { 'GET - Checkout Cart Page status was 200': (r) => r.status == 200 })
+    if (randomUserScenario <= 19.00) {
+        console.log("Checkout Cart Visit Scenario")
+        group("Checkout Cart Page - https://www/reserved.com/pl/pl/checkout/cart/", function () {
+            let getCheckoutCartPageResponse = http.get(getCheckoutCartPageRequest.url, getCheckoutCartPageRequest.params)
+            check(getCheckoutCartPageResponse, { 'GET - Checkout Cart Page status was 200': (r) => r.status == 200 })
 
-        let getVarnishAjaxNewIndexResponse = http.get(getVarnishAjaxNewIndexRequest.url, getVarnishAjaxNewIndexRequest.params)
-        check(getVarnishAjaxNewIndexResponse, { 'GET - Varnish status was 200': (r) => r.status == 200 })
-    });
+            let getVarnishAjaxNewIndexResponse = http.get(getVarnishAjaxNewIndexRequest.url, getVarnishAjaxNewIndexRequest.params)
+            check(getVarnishAjaxNewIndexResponse, { 'GET - Varnish status was 200': (r) => r.status == 200 })
+        });
+    }
 }
