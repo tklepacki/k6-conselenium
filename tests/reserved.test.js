@@ -1,6 +1,11 @@
 import { group, check } from "k6";
 import http from 'k6/http'
 import * as helper from '../helpers/helper.js'
+import { SharedArray } from "k6/data"
+
+const userData = new SharedArray("Test User Data", function () {
+    return JSON.parse(open('users.json')).users;
+})
 
 export const options = {
     ext: {
@@ -23,6 +28,9 @@ export const options = {
 
 export default function main() {
     let randomUserScenario = helper.getRandomNumber()
+    let randomUserNumber = helper.getRandomUserNumber()
+    let userFirstName = userData[randomUserNumber].firstName
+    console.log(userFirstName)
 
     let getCustomerAccountLoginPageRequest = {
         method: 'GET',
@@ -81,8 +89,8 @@ export default function main() {
                 method: 'POST',
                 url: 'https://www.reserved.com/pl/pl/ajx/customer/login/referer/aHR0cHM6Ly93d3cucmVzZXJ2ZWQuY29tL3BsL3BsLw,,/uenc/aHR0cHM6Ly93d3cucmVzZXJ2ZWQuY29tL3BsL3BsLw,,/?lpp_new_login',
                 body: {
-                    "login[username]": "performancetests0001@wp.pl",
-                    "login[password]": "Qweasd12@",
+                    "login[username]": userData[randomUserNumber].email,
+                    "login[password]": userData[randomUserNumber].password,
                     "login[remember_me]": "0",
                     form_key: formKey,
                 },
@@ -107,7 +115,7 @@ export default function main() {
         let getVarnishAjaxNewIndexResponse = http.get(getVarnishAjaxNewIndexRequest.url, getVarnishAjaxNewIndexRequest.params)
         check(getVarnishAjaxNewIndexResponse, {
             'GET - Varnish status was 200': (r) => r.status == 200,
-            'User has been logged in successfully': (r) => r.body.includes('Tomasz') == true
+            'User has been logged in successfully': (r) => r.body.includes(userData[randomUserNumber].firstName) == true
         })
     })
 
