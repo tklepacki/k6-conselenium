@@ -1,0 +1,34 @@
+{
+    "users": [
+        {
+            "email": "performancetests0001@wp.pl",
+            "password": "Qweasd12@",
+            "firstName": "Tomasz",
+            "id": "1"
+        },
+        {
+            "email": "performancetests0001@wp.pl",
+            "password": "Qweasd12@",
+            "firstName": "Marek",
+            "id": "2"
+        },
+        {
+            "email": "performancetests0001@wp.pl",
+            "password": "Qweasd12@",
+            "firstName": "Jarek",
+            "id": "3"
+        },
+        {
+            "email": "performancetests0001@wp.pl",
+            "password": "Qweasd12@",
+            "firstName": "Agata",
+            "id": "4"
+        },
+        {
+            "email": "performancetests0001@wp.pl",
+            "password": "Qweasd12@",
+            "firstName": "Anna",
+            "id": "5"
+        }
+    ]
+}
